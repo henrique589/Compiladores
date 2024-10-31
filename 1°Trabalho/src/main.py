@@ -19,11 +19,5 @@ with open(TESTE_FILE, 'r') as arquivo:
             # Lógica do automato
             lexema.append(c)
 
-# if estado == 0:
-#     pass
-
-
-        # estado = 0
-        # if estado == 0:
-        #     if c == '(':
-        #         token = Token(c, "LBRACKET", numLinha)
+## IMPLEMENTAR CONTADOR PARA INICIAR OS LEXEMAS
+## IMPLEMENTAR LÓGICA DO AUTÔMATO
