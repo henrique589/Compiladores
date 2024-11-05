@@ -9,6 +9,9 @@ tokens = []
 num_linha = 1
 estado = 0
 
+def automato(lexema, caractere):
+    pass
+
 with open(TESTE_FILE, 'r') as arquivo:
     for line in arquivo:
         buffer = line.rstrip('\n')
