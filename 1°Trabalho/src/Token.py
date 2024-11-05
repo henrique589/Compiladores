@@ -23,5 +23,7 @@ class Token:
             "}": "RBRACE",
         }
 
-        if self.lexema in ReserveWords:
-            self.tipoToken = ReserveWords[self.lexema]
+        return ReserveWords
+
+        # if self.lexema in ReserveWords:
+        #     self.tipoToken = ReserveWords[self.lexema]
