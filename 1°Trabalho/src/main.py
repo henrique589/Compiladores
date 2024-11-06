@@ -1,20 +1,14 @@
-from Lexema import Lexema
-from Token import Token
+from AutomatoLexico import AutomatoLexico
 from pathlib import Path
 
-TESTE_FILE = Path(__file__).parent / 'testes/calculadora.p'
+TESTE_FILE = Path(__file__).parent / 'testes/t.p'
 
-tokens = []
-
-def automato(lexema, caractere):
-    pass
+automatoLexico = AutomatoLexico()
 
 with open(TESTE_FILE, 'r') as arquivo:
     for line in arquivo:
-        buffer = line.rstrip('\n')
-        for c in buffer:
-            if c == ' ':
-                ...
+        for caractere in line:
+            automatoLexico.processar_caractere(caractere)
 
-## IMPLEMENTAR CONTADOR PARA INICIAR OS LEXEMAS
-## IMPLEMENTAR LÓGICA DO AUTÔMATO
+for token in automatoLexico.tokens:
+    print(token)

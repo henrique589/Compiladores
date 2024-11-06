@@ -1,10 +1,11 @@
 class Token:
-    def __init__(self, lexema, numLinha):
+    def __init__(self, tipoToken, lexema, numLinha):
         self.lexema = lexema
-        self.tipoToken = None
+        self.tipoToken = tipoToken
         self.numLinha = numLinha
     
-    def classificacao_token(self):
+    @staticmethod
+    def palavras_reservadas():
         ReserveWords = {
             "fn": "FUNCTION",
             "main": "MAIN",
@@ -16,14 +17,25 @@ class Token:
             "else": "ELSE",
             "while": "WHILE",
             "println": "PRINTLN",
-            "return": "RETURN",
+            "return": "RETURN"
+        }
+        return ReserveWords
+
+    @staticmethod
+    def simbolos_especiais():
+        symbols = {
             "(": "LBRACKET",
             ")": "RBRACKET",
             "{": "LBRACE",
             "}": "RBRACE",
+            ":": "COLLON",
+            ",": "COMMA",
+            ";": "PCOMMA",
+            "+": "PLUS",
+            "*": "MULT",
+            "/": "DIV"
         }
-
-        return ReserveWords
-
-        # if self.lexema in ReserveWords:
-        #     self.tipoToken = ReserveWords[self.lexema]
+        return symbols
+    
+    def __repr__(self):
+        return f"Token(tipo={self.tipoToken}, lexema={self.lexema.start}, {self.lexema.end} linha={self.numLinha})"
