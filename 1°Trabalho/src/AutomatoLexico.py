@@ -37,6 +37,14 @@ class AutomatoLexico:
                 self.lexema.append(caractere)
                 self.inicio_lexema = self.posicao_atual
                 self.estado = 3
+            elif caractere == '<':
+                self.lexema.append(caractere)
+                self.inicio_lexema = self.posicao_atual
+                self.estado = 4
+            elif caractere == '-':
+                self.lexema.append(caractere)
+                self.inicio_lexema = self.posicao_atual
+                self.estado = 5
             elif caractere == ' ':
                 self.lexema = []
                 pass
@@ -48,7 +56,7 @@ class AutomatoLexico:
                 self.lexema.append(caractere)
                 tipoToken = 'EQ'
                 self.cria_token(tipoToken, self.inicio_lexema, self.posicao_atual) 
-            elif caractere is not '=':
+            elif caractere != '=':
                 self.lexema.append(caractere)
                 tipoToken = 'ASSIGN'
                 self.cria_token(tipoToken, self.inicio_lexema, self.posicao_atual)
@@ -62,9 +70,26 @@ class AutomatoLexico:
                 self.lexema.append(caractere)
                 tipoToken = 'GE'
                 self.cria_token(tipoToken, self.inicio_lexema, self.posicao_atual)
-            elif caractere is not '=':
+            elif caractere != '=':
                 self.lexema.append(caractere)
                 tipoToken = 'GT'
                 self.cria_token(tipoToken, self.inicio_lexema, self.posicao_atual)
+        elif self.estado == 4:
+            if caractere == '=':
+                self.lexema.append(caractere)
+                tipoToken = 'LE'
+                self.cria_token(tipoToken, self.inicio_lexema, self.posicao_atual)
+            elif caractere != '=':
+                self.lexema.append(caractere)
+                tipoToken = 'LT'
+                self.cria_token(tipoToken, self.inicio_lexema, self.posicao_atual)
+        elif self.estado == 5:
+            if caractere == '>':
+                self.lexema.append(caractere)
+                tipoToken = 'ARROW'
+                self.cria_token(tipoToken, self.inicio_lexema, self.posicao_atual)
+            elif caractere != '>':
+                self.lexema.append(caractere)
+                tipoToken = 'MINUS'
+                self.cria_token(tipoToken, self.inicio_lexema, self.posicao_atual)
         self.posicao_atual += 1
-                

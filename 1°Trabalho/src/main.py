@@ -1,7 +1,7 @@
 from AutomatoLexico import AutomatoLexico
 from pathlib import Path
 
-TESTE_FILE = Path(__file__).parent / 'testes/tokens.p'
+TESTE_FILE = Path(__file__).parent / 'testes/t.p'
 
 automatoLexico = AutomatoLexico()
 
