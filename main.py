@@ -1,5 +1,49 @@
-from Token import Token
-from Lexema import Lexema
+class Lexema:
+    def __init__(self, start, end):
+        self.start = start
+        self.end = end
+
+class Token:
+    def __init__(self, tipoToken, lexema, numLinha):
+        self.lexema = lexema
+        self.tipoToken = tipoToken
+        self.numLinha = numLinha
+    
+    @staticmethod
+    def palavras_reservadas():
+        ReserveWords = {
+            "fn": "FUNCTION",
+            "main": "MAIN",
+            "let": "LET",
+            "int": "INT",
+            "float": "FLOAT",
+            "char": "CHAR",
+            "if": "IF",
+            "else": "ELSE",
+            "while": "WHILE",
+            "println": "PRINTLN",
+            "return": "RETURN"
+        }
+        return ReserveWords
+
+    @staticmethod
+    def simbolos_especiais():
+        symbols = {
+            "(": "LBRACKET",
+            ")": "RBRACKET",
+            "{": "LBRACE",
+            "}": "RBRACE",
+            ":": "COLLON",
+            ",": "COMMA",
+            ";": "PCOMMA",
+            "+": "PLUS",
+            "*": "MULT",
+            "/": "DIV"
+        }
+        return symbols
+    
+    def __repr__(self):
+        return f"Token(tipo={self.tipoToken}, lexema={self.lexema.start}, {self.lexema.end} linha={self.numLinha})"
 
 class AutomatoLexico:
     def __init__(self):
@@ -20,8 +64,6 @@ class AutomatoLexico:
         self.lexema = []
 
     def processar_caractere(self, caractere: str):
-        reprocessar = False
-
         if self.estado == 0:
             if caractere in self.symbols:
                 self.inicio_lexema = self.posicao_atual
@@ -51,8 +93,6 @@ class AutomatoLexico:
                 self.inicio_lexema = self.posicao_atual
                 self.estado = 6
                 self.lexema.append(caractere)
-            elif caractere.isalpha():
-                pass
             elif caractere == ' ':
                 ...
             elif caractere == '\n':
@@ -66,7 +106,7 @@ class AutomatoLexico:
             else:
                 tipoToken = 'ASSIGN'
                 self.cria_token(tipoToken, self.inicio_lexema, self.posicao_atual-1)
-                reprocessar = True
+                self.processar_caractere(caractere)  # Reprocessa o caractere atual
         elif self.estado == 2:
             if caractere == '=':
                 self.lexema.append(caractere)
@@ -75,7 +115,7 @@ class AutomatoLexico:
             else:
                 tipoToken = 'ERROR'
                 self.cria_token(tipoToken, self.inicio_lexema, self.posicao_atual)
-                reprocessar = True
+                self.processar_caractere(caractere)  # Reprocessa o caractere atual
         elif self.estado == 3:
             if caractere == '=':
                 self.lexema.append(caractere)
@@ -83,8 +123,8 @@ class AutomatoLexico:
                 self.cria_token(tipoToken, self.inicio_lexema, self.posicao_atual)
             else:
                 tipoToken = 'GT'
-                self.cria_token(tipoToken, self.inicio_lexema, self.posicao_atual - 1)
-                reprocessar = True
+                self.cria_token(tipoToken, self.inicio_lexema, self.posicao_atual)
+                self.processar_caractere(caractere)
         elif self.estado == 4:
             if caractere == '=':
                 self.lexema.append(caractere)
@@ -92,8 +132,8 @@ class AutomatoLexico:
                 self.cria_token(tipoToken, self.inicio_lexema, self.posicao_atual)
             else:
                 tipoToken = 'LT'
-                self.cria_token(tipoToken, self.inicio_lexema, self.posicao_atual - 1)
-                reprocessar = True
+                self.cria_token(tipoToken, self.inicio_lexema, self.posicao_atual)
+                self.processar_caractere(caractere)
         elif self.estado == 5:
             if caractere == '>':
                 self.lexema.append(caractere)
@@ -102,7 +142,7 @@ class AutomatoLexico:
             else:
                 tipoToken = 'MINUS'
                 self.cria_token(tipoToken, self.inicio_lexema, self.posicao_atual)
-                reprocessar = True
+                self.processar_caractere(caractere)
         elif self.estado == 6:
             if caractere.isnumeric():
                 self.lexema.append(caractere)
@@ -112,7 +152,7 @@ class AutomatoLexico:
             else:
                 tipoToken = 'INT_CONST'
                 self.cria_token(tipoToken, self.inicio_lexema, self.posicao_atual - 1)
-                reprocessar = True
+                self.processar_caractere(caractere)
         elif self.estado == 7:
             if caractere.isnumeric():
                 self.lexema.append(caractere)
@@ -120,16 +160,26 @@ class AutomatoLexico:
             else:
                 tipoToken = 'ERROR'
                 self.cria_token(tipoToken, self.inicio_lexema, self.posicao_atual)
-                reprocessar = True
+                self.processar_caractere(caractere)
         elif self.estado == 8:
             if caractere.isnumeric():
                 self.lexema.append(caractere)
             else:
                 tipoToken = 'FLOAT_CONST'
                 self.cria_token(tipoToken, self.inicio_lexema, self.posicao_atual - 1)
-                reprocessar = True
+                self.processar_caractere(caractere)
+        self.posicao_atual += 1
 
-        if not reprocessar:
-            self.posicao_atual += 1
-        else:
-            self.processar_caractere(caractere)
+from pathlib import Path
+
+TESTE_FILE = Path(__file__).parent / 't.p'
+
+automatoLexico = AutomatoLexico()
+
+with open(TESTE_FILE, 'r') as arquivo:
+    for line in arquivo:
+        for caractere in line:
+            automatoLexico.processar_caractere(caractere)
+
+for token in automatoLexico.tokens:
+    print(token)
