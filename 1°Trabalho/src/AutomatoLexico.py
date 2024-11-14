@@ -21,7 +21,6 @@ class AutomatoLexico:
 
     def processar_caractere(self, caractere: str):
         reprocessar = False
-
         if self.estado == 0:
             if caractere in self.symbols:
                 self.inicio_lexema = self.posicao_atual
@@ -52,7 +51,9 @@ class AutomatoLexico:
                 self.estado = 6
                 self.lexema.append(caractere)
             elif caractere.isalpha():
-                pass
+                self.inicio_lexema = self.posicao_atual
+                self.estado = 9
+                self.lexema.append(caractere)
             elif caractere == ' ':
                 ...
             elif caractere == '\n':
@@ -126,6 +127,18 @@ class AutomatoLexico:
                 self.lexema.append(caractere)
             else:
                 tipoToken = 'FLOAT_CONST'
+                self.cria_token(tipoToken, self.inicio_lexema, self.posicao_atual - 1)
+                reprocessar = True
+        elif self.estado == 9:
+            if caractere.isalpha() or caractere.isnumeric() or caractere == '_':
+                self.lexema.append(caractere)
+            else:
+                # Converte `self.lexema` para uma string unida e exibe para depuração
+                lexema_str = ''.join(self.lexema) 
+                if lexema_str in self.reserveWords:
+                    tipoToken = self.reserveWords[lexema_str]
+                else:
+                    tipoToken = 'ID'
                 self.cria_token(tipoToken, self.inicio_lexema, self.posicao_atual - 1)
                 reprocessar = True
 
