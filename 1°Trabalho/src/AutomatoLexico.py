@@ -7,10 +7,15 @@ class AutomatoLexico:
         self.lexema = []
         self.tokens = []
         self.linha_atual = 1
-        self.posicao_atual = 1
-        self.inicio_lexema = 1
+        self.posicao_atual = 0 
+        self.inicio_lexema = 0
         self.reserveWords = Token.palavras_reservadas()
         self.symbols = Token.simbolos_especiais()
+
+    def cria_token_eof(self):
+        lexema = Lexema(self.posicao_atual, self.posicao_atual)
+        token = Token("EOF", lexema, self.linha_atual)
+        self.tokens.append(token)
 
     def cria_token(self, tipoToken, inicio, fim):
         lexema = Lexema(inicio, fim)
@@ -18,6 +23,15 @@ class AutomatoLexico:
         self.tokens.append(token)
         self.estado = 0
         self.lexema = []
+
+    def finalizar_analise(self):
+        if self.estado == 9 and self.lexema:
+            lexema_str = ''.join(self.lexema)
+            if lexema_str in self.reserveWords:
+                tipoToken = self.reserveWords[lexema_str]
+            else:
+                tipoToken = 'ID'
+            self.cria_token(tipoToken, self.inicio_lexema, self.posicao_atual - 1)
 
     def processar_caractere(self, caractere: str):
         reprocessar = False
@@ -54,11 +68,17 @@ class AutomatoLexico:
                 self.inicio_lexema = self.posicao_atual
                 self.estado = 9
                 self.lexema.append(caractere)
+            elif caractere == "'":
+                self.inicio_lexema = self.posicao_atual
+                self.estado = 10
+            elif caractere == '"':
+                self.inicio_lexema = self.posicao_atual
+                self.estado = 12
             elif caractere == ' ':
                 ...
             elif caractere == '\n':
                 self.linha_atual += 1
-                self.posicao_atual = 0
+                self.posicao_atual = 0 
         elif self.estado == 1:
             if caractere == '=':
                 self.lexema.append(caractere)
@@ -66,7 +86,7 @@ class AutomatoLexico:
                 self.cria_token(tipoToken, self.inicio_lexema, self.posicao_atual)
             else:
                 tipoToken = 'ASSIGN'
-                self.cria_token(tipoToken, self.inicio_lexema, self.posicao_atual-1)
+                self.cria_token(tipoToken, self.inicio_lexema, self.posicao_atual - 1)
                 reprocessar = True
         elif self.estado == 2:
             if caractere == '=':
@@ -133,14 +153,45 @@ class AutomatoLexico:
             if caractere.isalpha() or caractere.isnumeric() or caractere == '_':
                 self.lexema.append(caractere)
             else:
-                # Converte `self.lexema` para uma string unida e exibe para depuração
-                lexema_str = ''.join(self.lexema) 
+                lexema_str = ''.join(self.lexema)
                 if lexema_str in self.reserveWords:
                     tipoToken = self.reserveWords[lexema_str]
                 else:
                     tipoToken = 'ID'
                 self.cria_token(tipoToken, self.inicio_lexema, self.posicao_atual - 1)
                 reprocessar = True
+        elif self.estado == 10:
+            if caractere != "'": 
+                self.lexema.append(caractere)
+                self.estado = 11
+            else:  
+                tipoToken = 'ERROR'  
+                self.cria_token(tipoToken, self.inicio_lexema, self.posicao_atual)
+        elif self.estado == 11:
+            if caractere == "'":
+                tipoToken = 'CHAR_LITERAL'
+                self.cria_token(tipoToken, self.inicio_lexema, self.posicao_atual)
+            else: 
+                tipoToken = 'ERROR'
+                self.cria_token(tipoToken, self.inicio_lexema, self.posicao_atual - 1)
+                reprocessar = True
+        elif self.estado == 12:
+            if caractere != '"':
+                self.lexema.append(caractere)
+                self.estado = 13
+            else:
+                tipoToken = 'FMT_STRING'
+                self.cria_token(tipoToken, self.inicio_lexema, self.posicao_atual)
+        elif self.estado == 13:
+            if caractere == '"':
+                tipoToken = 'FMT_STRING'
+                self.cria_token(tipoToken, self.inicio_lexema, self.posicao_atual)
+            elif caractere == '\n':
+                tipoToken = 'ERROR'
+                self.cria_token(tipoToken, self.inicio_lexema, self.posicao_atual - 1)
+                reprocessar = True
+            else:
+                self.lexema.append(caractere)
 
         if not reprocessar:
             self.posicao_atual += 1

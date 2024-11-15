@@ -9,3 +9,5 @@ a = 5
 12
 main
 fn
+'a'
+"abc"

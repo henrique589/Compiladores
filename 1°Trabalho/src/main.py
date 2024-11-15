@@ -1,7 +1,7 @@
 from AutomatoLexico import AutomatoLexico
 from pathlib import Path
 
-TESTE_FILE = Path(__file__).parent / 'testes/t.p'
+TESTE_FILE = Path(__file__).parent / 'testes/calculadora.p'
 
 automatoLexico = AutomatoLexico()
 
@@ -11,8 +11,8 @@ with open(TESTE_FILE, 'r') as arquivo:
         for caractere in line:
             automatoLexico.processar_caractere(caractere)
 
-# Finaliza qualquer token remanescente após a última linha do arquivo
-automatoLexico.processar_caractere(' ')  # Gatilho para transições de estado pendentes
+automatoLexico.finalizar_analise()
+automatoLexico.cria_token_eof()
 
 # Exibe os tokens processados
 for token in automatoLexico.tokens:
